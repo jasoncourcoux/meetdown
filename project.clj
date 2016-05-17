@@ -38,12 +38,12 @@
                         :figwheel true
                         :compiler {:output-to "resources/private/js/unit-test.js"
                                    :optimizations :whitespace
-                                   :pretty-print true}}}
+                                   :pretty-print true}}}}
 
               ;; CHJ- had real trouble using cljsbuild with cljs.test/async tests so gave up and used 'doo' which just worked out of the box.
               ;;              :test-commands
               ;;              {"unit" ["phantomjs" "phantom/unit-test.js" "phantom/unit-test.html"]}
-              }
+
   :profiles {:uberjar {:aot :all
                        :prep-tasks ["compile" ["cljsbuild" "once" "app"]]}
              :dev {:source-paths ["dev" "src-cljs" "test" "test-cljs"]

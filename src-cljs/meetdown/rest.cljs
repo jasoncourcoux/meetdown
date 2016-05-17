@@ -24,3 +24,13 @@
                                               :edn-params {:type :get-event
                                                            :txn-data {:db/id id}}}))]
     post-channel))
+
+(defn list-events
+  []
+  (let [post-channel (petrol/wrap m/map->ListEventsResults
+                                  (http/post "/q"
+                                             {:with-credentials? false
+                                              :edn-params {:type :get-events}}))]
+    post-channel))
+
+

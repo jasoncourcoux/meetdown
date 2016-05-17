@@ -43,8 +43,8 @@
                 :output-to    "resources/public/js/compiled/meetdown.js"
                 :output-dir   "resources/public/js/compiled/out"
                 :asset-path   "js/compiled/out"
-                :source-map-timestamp true
-                }}]})
+                :source-map-timestamp true}}]})
+
 
 
 (defn start-figwheel! [] (do (ra/start-figwheel! figwheel-config) nil))

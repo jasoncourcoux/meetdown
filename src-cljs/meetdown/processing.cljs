@@ -20,6 +20,11 @@
   [response]
   (->> response :body (reduce (remove-ns "event") {})))
 
+(defn- extract-events
+  "Extracts events from the response"
+  [response]
+  (->> response :body (map (fn [x] (reduce (remove-ns "event") {} x)))))
+
 (extend-protocol Message
   m/CreateEventResults
   (process-message [response app]
@@ -46,3 +51,18 @@
     (let [id       (if (string? id) (long id) id)
           rest-res (rest/find-event id)]
       #{rest-res})))
+
+(extend-protocol Message
+  m/ListEventsResults
+  (process-message [response app]
+    (let [events  (extract-events response)
+          new-app (-> app
+                      (assoc :server-state events)
+                      (assoc-in [:view :handler] :events-list))]
+      new-app)))
+
+(extend-protocol EventSource
+  m/ListEvents
+  (watch-channels [message app]
+    (let [rest-response (rest/list-events)]
+      #{rest-response})))

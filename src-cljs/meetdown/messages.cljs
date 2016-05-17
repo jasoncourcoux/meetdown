@@ -15,3 +15,7 @@
 (defrecord FindEvent [id])
 
 (defrecord FindEventResults [body])
+
+(defrecord ListEvents [])
+
+(defrecord ListEventsResults [body])

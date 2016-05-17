@@ -2,15 +2,26 @@
   (:require [petrol.core :refer [send! send-value!]]
             [meetdown.messages :as m]
             [meetdown.routes :refer [href-for]]
+            [clojure.string :as str]
             [cljs.core.match :refer-macros [match]]
             [cljs.core.async :refer [put!]]))
 
 (defn- home-view
   [ui-channel]
   [:div.col-xs-12
-   (for [[link title] [[(href-for :new-event) "Create new meetdown"]]]
+   (for [[link title] [[(href-for :new-event) "Create new meetdown"][(href-for :events) "List Events"]]]
      [:div.row.col-xs-12 {:key title}
       [:a {:href link} title]])])
+
+(defn- events-view
+  [ui-channel server-state view]
+  (let [events (sort-by #(-> % :name (str/lower-case)) server-state)]
+    [:div
+      [:div.row
+       [:h3.col-xs-12 "Events"]
+       (map (fn [e]
+              [:div.row.col-xs-12 {:key (:id e)}
+                [:a {:href (href-for :event {:id (:id e)})} (:name e)]]) events)]]))
 
 (defn- server-view
   [ui-channel server-state view]
@@ -55,16 +66,23 @@
   (when-let [id (get-in view [:route-params :id])]
     (put! ui-channel (m/->FindEvent id))))
 
+(defn events-lister
+  [ui-channel]
+  (put! ui-channel (m/->ListEvents)))
+
 (defn root
   [ui-channel {:keys [event server-state view] :as app}]
   [:div
    [:div.container
     [:div.row
      [:div.col-xs-12.col-xs-6.col-xs-offset-3
-      [:h2 "Event Management Client"]]]
+      [:a {:href (href-for :home)}
+      [:h2 "Event Management Client"]]]]
     [:div.row.col-xs-12 [:br]]
     (match [(:handler view)]
            [:new-event]   [event-form ui-channel event]
            [:event]       (event-lookup ui-channel view)
            [:event-found] [server-view ui-channel server-state view]
+           [:events]      (events-lister ui-channel)
+           [:events-list] [events-view ui-channel server-state view]
            :else          [home-view ui-channel])]])
